@@ -1,0 +1,11 @@
+@use "variables";
+
+@mixin news-info-font {
+  font-family: variables.$font-news-info, sans-serif;
+}
+
+@mixin button-style {
+  border-radius: 15px;
+  background-color: rgba(#000000, 0.8);
+  color: royalblue;
+}
