@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech News - Samuel Barbieri</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Buenard:wght@400;700&family=Chakra+Petch:ital,wght@0,300;0,400;1,300&family=Jersey+10&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header id="top">
+        <h1>Tech News</h1>
+        <div class="news-counter">Loaded news:</div>
+    </header>
+
+    <!-- Aside navigation buttons-->
+    <aside>
+        <a href="#top"><img src="/assets/img/arrow-icon.png" style="transform: rotate(270deg);"></img></a>
+        <a href="#bottom"><img src="/assets/img/arrow-icon.png" style="transform: rotate(90deg);"></img></a>
+    </aside>
+
+    <!-- Main news container -->
+    <main class="news-container">
+        <!-- NEWS GOES HERE -->
+    </main>
+
+    <!-- Button to load 10 more news -->
+    <button id="bottom" class="load-more-btn">Load more</button>
+
+    <!-- Loader icon-->
+    <div class="loader"></div>
+
+    <!-- Loading screen -->
+    <div class="loading-screen"><span>Tech News</span></div>
+    
+    <!-- Rejected Main Fetch Error Panel-->
+    <div id="error-panel"> There has been an error while loading the news, please try again later. </div>
+
+    <!-- Credits-->
+    <span class="credits"><a href="https://www.flaticon.com/free-icons/arrows" title="arrows icons" target="_blank">Arrows created by Pixel perfect - Flaticon</a> </span>
+    
+    <!-- Script -->
+    <script src="/assets/js/script.js"></script>
+</body>
+</html>
