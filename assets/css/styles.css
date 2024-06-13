@@ -9,7 +9,7 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  height: 101vh;
+  min-height: 101vh;
 }
 
 header {
@@ -91,6 +91,7 @@ aside a:last-child img {
 .news-container .news .news-info {
   margin-top: 5px;
   font-family: "Chakra Petch", sans-serif;
+  color: #8C8DB9;
 }
 .news-container .news .news-info .news-author {
   margin: 3px 0 2px 0;
@@ -102,10 +103,20 @@ aside a:last-child img {
   bottom: 1em;
   left: 1em;
   margin-left: auto;
-  color: #8C8DB9;
 }
-.news-container .news .news-description {
-  margin: 10px 0;
+.news-container .news .news-info .news-text-toggle {
+  color: #0044B4;
+  display: inline-block;
+}
+.news-container .news .news-info .news-text-toggle:hover {
+  color: royalblue;
+}
+.news-container .news .news-info .news-text-toggle:active {
+  color: lightblue;
+}
+.news-container .news .news-info .news-text a {
+  text-decoration: none;
+  color: #0044B4;
 }
 .news-container .news .news-article-link {
   position: absolute;
@@ -220,6 +231,10 @@ aside a:last-child img {
 .credits a {
   color: #000B69;
   text-decoration: none;
+}
+
+.hidden {
+  display: none;
 }
 
 @media screen and (max-width: 750px) {

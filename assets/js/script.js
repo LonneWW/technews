@@ -1,7 +1,4 @@
-
-/**
- * Selection of DOMS obcjets
- */
+// Selection of DOM objects
 let loadMoreButton = document.getElementById("bottom");
 let newsContainer = document.querySelector(".news-container");
 let newsCounter = document.querySelector(".news-counter");
@@ -9,89 +6,117 @@ let loaderIcon = document.querySelector(".loader");
 let loadingScreen = document.querySelector(".loading-screen");
 let errorPanel = document.querySelector("#error-panel");
 
+
+//Inizializing idsArray and newsCountervalue
+
+let idsArray=[];
 let newsCounterValue = 0;
 
-/* Async function, on window load fetch data from hacker news API, 
- * get 10 ids and call getNewsDetails function*/
-let _idsArray;
-window.onload = async function() {
-  loadMoreButton.style.display = "none"; // Hide the button initially
-  try{
-    let promise = await fetch("https://hacker-news.firebaseio.com/v0/newstories.json");
-    _idsArray = await promise.json();
-  }catch(err){
-    errorPanel.style.display = "flex";
-    errorPanel.innerHTML = `There has been an error while loading the news, please try again later.
-    <br> Error details: ${err.name}: ${err.message}`
-    console.log(err);
-  }
-  getNewsDetails();
-  setTimeout(()=>{loadingScreen.style.opacity = 0;}, 600); // Hide the loading screen after 2 seconds of loadingScreen.style.opacity = 0;
-  setTimeout(()=>{loadingScreen.style.display = "none";}, 1200); // For navigation porpouses, we set the display to none after 1.4 seconds (time taken by the animation to finish)
-  loadMoreButton.style.display = "block";
 
-};
+//Functions
 
 /**
- * The function `getNewsDetails` asynchronously fetches news details from Hacker News API using a list
- * of IDs and processes the responses by parsing them as JSON and passing the data to a function called
- * `newsBuilder`.
+ * The function `getNewsDetails` fetches news details from an API, handles errors, and updates the news
+ * counter and loader animation accordingly.
  */
 async function getNewsDetails(){
   loaderIcon.style.display = "block"; // Show the loader animation
-  let ids = _idsArray.splice(0, 10);
-  if (ids.length == 0) { loadMoreButton.style.display = "none"; }; // If there are no more news, hide the button
-  try {
-    let request = await ids.map(id=>fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`));
+  try{
+    if (idsArray.length == 0 && newsCounterValue > 1) { // It there are no more news, throw the error and hide the button.
+      //The news counter value check is made to prevent the noNewsAvaliableError to run if the result of the main fetch is undefined.
+      throw new noNewsAvailableError(`There are no more news available to load, please refresh the page to see more recent ones`)
+    }
+    let ids = idsArray.splice(0, 10);
+    let request = ids.map(id=>fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`));
     let responses = await Promise.all(request);  
     for(let res of responses) {
+      let validRes = await convalidNewsId(res);
+      if (validRes === "skip") continue;
       let data = await res.json(); 
-      convalidNewsInfo(data); // Checks if the news info are valid
+      data = await convalidNewsInfo(data); // Checks if the news info are valid
       newsBuilder(data); //  Creates the news
     }
-  } catch(err) {
-    console.log("An error has occurred:", err);
+  } catch (err) {
+    if (err instanceof noNewsAvailableError){
+      alert(`${err.message}`)
+      console.log(err)
+      loadMoreButton.style.display = "none";
+    } else {
+      alert(`A ${err.name} has occurred: ${err.message}`);
+      console.log("An error has occurred:", err)
+    }
   } finally {
     newsCounter.textContent = `Loaded news: ${newsCounterValue}`; // Update the news counter
     loaderIcon.style.display = "none"; //stop the loader animation
   }
 }
 
-
-
 /**
- * The function `convalidNewsInfo` checks if the provided data has a title and URL, and if not, it
- * fetches news information from Hacker News API or gets the next news item.
- * @param data - The `convalidNewsInfo` function is an asynchronous function that takes in a `data`
- * object as a parameter. The function first checks if the `data` object has `title` and `url`
- * properties. If either of these properties is missing, it tries to fetch news information from the
- * @returns The `convalidNewsInfo` function returns the `data` object after performing some validations
- * and modifications. If the `data` object does not have a `title` or `url` property, it will make a
- * fetch request to get news information from the Hacker News API using an ID from the `_idsArray`. If
- * the fetch request is successful, it will return the retrieved data. If the `data` object does not have
- * a `by` or `time` property, it will add them with default values.
+ * The function `convalidNewsId` checks and skips news with invalid response bodies from a fetch
+ * request.
+ * @param res - The `res` parameter in the `convalidNewsId` function is the response object returned
+ * from a fetch request. The function checks if the response is not okay or has a status of 204 (No
+ * Content). If either condition is met, it logs a message and attempts to fetch a new
+ * @returns The function `convalidNewsId` returns a Promise that resolves to the response object from a
+ * fetch request. If the response is not ok or has a status of 204, the function will log a message and
+ * continue fetching news items until a valid response is received. If there are no more news IDs to
+ * fetch, it will return the string "skip".
  */
-async function convalidNewsInfo(data){
-  if (!data) throw Error(`Invalid json Object`);
-  if (data.title === undefined || data.url === undefined) {
-    try{
-      let newID = _idsArray.splice(0, 1)[0];
-      let request = await fetch(`https://hacker-news.firebaseio.com/v0/item/${newID}.json`);
-      data = await request.json();
-      return data;
-    } catch {
-      return convalidNewsInfo(); //Recall itself if title or url are invalid
+async function convalidNewsId(res){
+  while (!res.ok || res.status === 204){
+    console.log("A news has been skipped due to an invalid response body from fetch");
+    if (idsArray.length === 0) {
+      return res == "skip";
     }
-  };
-  if (data.by == undefined) {data.by = `Error, could get author name`};
-  if (data.time == undefined) {data.time = `Error, could get news date`};
+    let newID = idsArray.splice(0, 1)[0];
+    try {
+      res = await fetch(`https://hacker-news.firebaseio.com/v0/item/${newID}.json`);
+    } catch (error) {
+      console.error('Errore di rete:', error);
+    }
+  }
+  return res;
 }
 
 /**
- * The `newsBuilder` function dynamically generates HTML elements to display news data on a webpage.
+ * The function `convalidNewsInfo` is an asynchronous function that validates news data and fetches
+ * additional data if necessary before returning the validated news object.
+ * @param data - The `data` parameter in the `convalidNewsInfo` function is an object that should have
+ * the properties `title` and `url`. If these properties are missing or undefined, the function will
+ * log an error message and attempt to fetch new data from a Hacker News API using an ID from an
+ * @returns The `convalidNewsInfo` function returns the validated news data object with the author name
+ * and news date filled in if they were missing.
+ */
+async function convalidNewsInfo(data){
+  if (!data || data.title === undefined || data.url === undefined) {
+    consoleNotification = (data != null && data.id) ? `Error: invalid object at id ${data.id}. News skipped` : `Error: id number ${data} invalid. News skipped`; // Create a notification for the console
+    console.log(consoleNotification);
+    let newID;
+    do {
+      if (idsArray.length < 1) throw new noNewsAvailableError("No more news available");
+      newID = idsArray.splice(0, 1)[0];
+    } while (newID === null || newID === undefined)
+    try{
+      let request = await fetch(`https://hacker-news.firebaseio.com/v0/item/${newID}.json`);
+      data = await request.json();
+    } catch (err){
+      console.log(`Error ${err.name}: id number ${newID} invalid. News skipped`) //Recall itself if title or url are invalid
+    } finally {
+      return convalidNewsInfo(data);
+    }
+  };
+  if (data.by === undefined) {data.by = `Error, missing author name`};
+  if (data.time === undefined) {data.time = `Error, missing news date`};
+  return data;
+}
+
+
+/**
+ * The `newsBuilder` function dynamically creates a news article element with various details and a
+ * toggle to show more text if available.
  * @param newsData - The `newsData` parameter in the `newsBuilder` function seems to contain
- * information about a news article. It likely includes the following properties: 
- * by, time, title, url, type, id etc.
+ * information about a news article. It includes properties such as `id`, `title`, `by` (author),
+ * `time` (timestamp), `url` (link to the article), and `text` (article description).
  */
 function newsBuilder(newsData){
   newsContainer.insertAdjacentHTML("beforeend", `
@@ -105,7 +130,15 @@ function newsBuilder(newsData){
     <span class="news-update-interval">${calculateUpdateInterval(newsData.time)}</span>
   </div>
     `);
-
+    if (newsData.text){
+      let currentNews = document.getElementById(`${newsData.id}`);
+      let currentNewsInfo = currentNews.querySelector(`.news-info`);
+      currentNewsInfo.insertAdjacentHTML("beforeend", `
+        <div class="news-text-toggle">&#8681; Show more &#8681;</div>
+        <div class="news-text hidden">${newsData.text}</div>`);
+      let newsToggle = currentNews.querySelector(`.news-text-toggle`);
+      newsToggle.addEventListener("click", newsDescriptionToggle);
+    }
   newsCounterValue++;
 }
 
@@ -117,7 +150,7 @@ function newsBuilder(newsData){
  * format (dd month yyyy), and returns the formatted date string.
  */
 function convertUnixInData(unixTime) {
-  if (unixTime instanceof String) return `Error, could get news date`; //Check if the input is a string for error handling porposes
+  if (typeof unixTime === "string") return unixTime; //Check if the input is a string for error handling porposes
   let data = new Date(unixTime * 1000); //Convert Unix in Date (seconds to milliseconds)
   let day = data.getDate();
   let month = data.getMonth();
@@ -137,7 +170,7 @@ function convertUnixInData(unixTime) {
  * ago the news was published. The function returns a string message based on the time difference:
  */
 function calculateUpdateInterval(newsUnix){
-  if (newsUnix instanceof String) return `Error, could get news date`; //Check if the input is a string for error handling porposes
+  if (typeof newsUnix === "string") return `Error, could not calculate the interval`; //Check if the input is a string for error handling porposes
   let newsDateObj = new Date(newsUnix * 1000); //Convert Unix in Date (seconds to milliseconds)
   let now = new Date();
   let diff = now - newsDateObj; // Calculate the difference in milliseconds
@@ -152,10 +185,12 @@ function calculateUpdateInterval(newsUnix){
   }
 }
 
+
 /**
  * The function `numberToMonth` takes a number as input and returns the corresponding month name.
  * @param number - The `number` parameter in the `numberToMonth` function represents the index of the
- * month in the `months` array. The function returns the month name based on the index provided.
+ * month in the `months` array. For example, if `number` is 0, the function will return `January`
+ * because `January` is at index 0 in the `months` array.
  * @returns The function `numberToMonth` takes a number as input and returns the corresponding month
  * name from the `months` array.
  */
@@ -165,7 +200,52 @@ function numberToMonth(number){
   return months[number];
 }
 
-/* If a major error occurs with the API to get the ids, the error panel will appear and
+/**
+ * The function `newsDescriptionToggle` toggles the visibility of a news description when a user clicks
+ * on a button, showing more or less content based on the current state.
+ * @param e - The parameter `e` in the `newsDescriptionToggle` function is typically an event object
+ * that represents the event that triggered the function. It can be an instance of the `Event`
+ * interface in JavaScript, containing information about the event such as the type of event, the
+ * target element that triggered the event
+ */
+function newsDescriptionToggle(e){
+  let newsTextToggle = e.target;
+  let newsText = newsTextToggle.nextElementSibling;
+  if (newsText.classList.contains("hidden") ){
+    newsTextToggle.innerHTML = "&#8679; Show less &#8679;";
+    newsText.classList.remove("hidden");
+  } else {
+    newsTextToggle.innerHTML = "&#8681; Show more &#8681;";
+    newsText.classList.add("hidden");
+  }
+}
+
+
+//Event handlers
+
+/* The code snippet provided is an asynchronous function assigned to the `window.onload` event.
+This function is executed when the window has finished loading. Here's a breakdown of what the
+function is doing: it starts by fetching to the Hacker News API a list of ids; if everything
+goes right, then calls the "getNewsDetails" function. During the execution it changes some 
+css styles of the loading elements.*/
+window.onload = async function() {
+  try{
+    let promise = await fetch("https://hacker-news.firebaseio.com/v0/newstories.json");
+    idsArray = await promise.json();
+  }catch(err){
+    errorPanel.style.display = "flex";
+    errorPanel.innerHTML = `There has been an error while loading the news, please try again later.
+    <br> Error details: ${err.name}: ${err.message}`
+    console.log(err);
+  }
+  await getNewsDetails()
+  loadingScreen.style.opacity = 0; // Hide the loading screen after 2 seconds of loadingScreen.style.opacity = 0;
+  await new Promise(resolve => setTimeout(resolve, 600)); // For navigation porpouses, we set the display to none after 0.6 seconds (time taken by the animation to finish)
+  loadingScreen.style.display = "none";
+};
+
+
+/* If a major error occurs with the main fetch to the Hacker News API, the error panel will appear and
  * block the navigation.
  */
 errorPanel.onclick = () => {
@@ -173,8 +253,19 @@ errorPanel.onclick = () => {
 }
 
 
-/* Adding an event listener to the `loadMoreButton` element. This event listener is set to trigger 
- * the `getNewsDetails` function when the `click` event occurs on the `loadMoreButton`, which creates
- * another 10 news articles.
- */
+/* The line is adding an event listener to the `loadMoreButton` element. When the user clicks on the
+`loadMoreButton`, the `getNewsDetails` function wil be executed, which will fetch and display
+more news details from the Hacker News API asynchronously. */
 loadMoreButton.addEventListener("click", getNewsDetails);
+
+
+//Classes
+
+/* The class `noNewsAvailableError` extends the `Error` class and is used to represent an error when no
+news is available. */
+class noNewsAvailableError extends Error{
+  constructor(message){
+    super(message);
+    this.name = "noNewsAvailableError";
+  }
+}

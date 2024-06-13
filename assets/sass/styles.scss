@@ -12,7 +12,7 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  height: 101vh; // To avoid the popup of the scrolling bar
+  min-height: 101vh; // To avoid the popup of the scrolling bar
 }
 
 header {
@@ -103,6 +103,7 @@ a:last-child {
     .news-info {
       margin-top: 5px;
       @include mixins.news-info-font;
+      color: variables.$secondary-text-color;
       .news-author {
         margin: 3px 0 2px 0;
         font-size: 1em;
@@ -113,13 +114,25 @@ a:last-child {
         bottom: 1em;
         left: 1em;
         margin-left: auto;
-        color: variables.$secondary-text-color;
+      }
+      .news-text-toggle {
+        color: variables.$main-color;
+        display: inline-block;
+      }
+      .news-text-toggle:hover{
+        color: royalblue;
+      }
+      .news-text-toggle:active{
+        color: lightblue;
+      }
+      .news-text{
+        a{
+          text-decoration: none;
+          color: variables.$main-color;
+        }
       }
     }
-    
-    .news-description {
-      margin: 10px 0;    
-    }
+
   
     .news-article-link {
       position: absolute;
@@ -231,6 +244,10 @@ a:last-child {
     text-decoration: none;
   }
 }
+
+ .hidden { // Class made for 
+    display: none;
+  }
 
 @media screen and (max-width: 750px) {
   header{
