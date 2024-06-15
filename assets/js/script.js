@@ -1,3 +1,12 @@
+import '../sass/styles.scss';
+import '../sass/_variables.scss';
+import '../sass/_mixins.scss';
+//Inizializing idsArray and newsCountervalue
+
+let idsArray=[];
+let newsCounterValue = 0;
+
+
 // Selection of DOM objects
 let loadMoreButton = document.getElementById("bottom");
 let newsContainer = document.querySelector(".news-container");
@@ -6,11 +15,54 @@ let loaderIcon = document.querySelector(".loader");
 let loadingScreen = document.querySelector(".loading-screen");
 let errorPanel = document.querySelector("#error-panel");
 
+//Event handlers
 
-//Inizializing idsArray and newsCountervalue
+/* The code snippet provided is an asynchronous function assigned to the `window.onload` event.
+This function is executed when the window has finished loading. Here's a breakdown of what the
+function is doing: it starts by fetching to the Hacker News API a list of ids; if everything
+goes right, then calls the "getNewsDetails" function. During the execution it changes some 
+css styles of the loading elements.*/
+window.onload = async function() {
+  try{
+    let promise = await fetch("https://hacker-news.firebaseio.com/v0/newstories.json");
+    idsArray = await promise.json();
+  }catch(err){
+    errorPanel.style.display = "flex";
+    errorPanel.innerHTML = `There has been an error while loading the news, please try again later.
+    <br> Error details: ${err.name}: ${err.message}`
+    console.log(err);
+  }
+  await getNewsDetails()
+  loadingScreen.style.opacity = 0; // Hide the loading screen after 2 seconds of loadingScreen.style.opacity = 0;
+  await new Promise(resolve => setTimeout(resolve, 600)); // For navigation porpouses, we set the display to none after 0.6 seconds (time taken by the animation to finish)
+  loadingScreen.style.display = "none";
+};
 
-let idsArray=[];
-let newsCounterValue = 0;
+
+/* If a major error occurs with the main fetch to the Hacker News API, the error panel will appear and
+ * block the navigation.
+ */
+errorPanel.onclick = () => {
+  return false;
+}
+
+
+/* The line is adding an event listener to the `loadMoreButton` element. When the user clicks on the
+`loadMoreButton`, the `getNewsDetails` function wil be executed, which will fetch and display
+more news details from the Hacker News API asynchronously. */
+loadMoreButton.addEventListener("click", getNewsDetails);
+
+
+//Classes
+
+/* The class `noNewsAvailableError` extends the `Error` class and is used to represent an error when no
+news is available. */
+class noNewsAvailableError extends Error{
+  constructor(message){
+    super(message);
+    this.name = "noNewsAvailableError";
+  }
+}
 
 
 //Functions
@@ -217,55 +269,5 @@ function newsDescriptionToggle(e){
   } else {
     newsTextToggle.innerHTML = "&#8681; Show more &#8681;";
     newsText.classList.add("hidden");
-  }
-}
-
-
-//Event handlers
-
-/* The code snippet provided is an asynchronous function assigned to the `window.onload` event.
-This function is executed when the window has finished loading. Here's a breakdown of what the
-function is doing: it starts by fetching to the Hacker News API a list of ids; if everything
-goes right, then calls the "getNewsDetails" function. During the execution it changes some 
-css styles of the loading elements.*/
-window.onload = async function() {
-  try{
-    let promise = await fetch("https://hacker-news.firebaseio.com/v0/newstories.json");
-    idsArray = await promise.json();
-  }catch(err){
-    errorPanel.style.display = "flex";
-    errorPanel.innerHTML = `There has been an error while loading the news, please try again later.
-    <br> Error details: ${err.name}: ${err.message}`
-    console.log(err);
-  }
-  await getNewsDetails()
-  loadingScreen.style.opacity = 0; // Hide the loading screen after 2 seconds of loadingScreen.style.opacity = 0;
-  await new Promise(resolve => setTimeout(resolve, 600)); // For navigation porpouses, we set the display to none after 0.6 seconds (time taken by the animation to finish)
-  loadingScreen.style.display = "none";
-};
-
-
-/* If a major error occurs with the main fetch to the Hacker News API, the error panel will appear and
- * block the navigation.
- */
-errorPanel.onclick = () => {
-  return false;
-}
-
-
-/* The line is adding an event listener to the `loadMoreButton` element. When the user clicks on the
-`loadMoreButton`, the `getNewsDetails` function wil be executed, which will fetch and display
-more news details from the Hacker News API asynchronously. */
-loadMoreButton.addEventListener("click", getNewsDetails);
-
-
-//Classes
-
-/* The class `noNewsAvailableError` extends the `Error` class and is used to represent an error when no
-news is available. */
-class noNewsAvailableError extends Error{
-  constructor(message){
-    super(message);
-    this.name = "noNewsAvailableError";
   }
 }
