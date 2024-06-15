@@ -58,7 +58,7 @@
 
 ## About The Project
 
-![Website Image](assets/img/preview-image.>png)
+![Website Image](assets/img/preview-image.png)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
