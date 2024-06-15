@@ -138,7 +138,7 @@ If you'd like to spend some of your time to tell me what you think about it or m
 [sass-url]: https://sass-lang.com
 [js-badge]: https://img.shields.io/badge/Javascript-grey?style=flat&logo=javascript&logoColor=%23F7DF1E
 [js-url]: https://www.w3schools.com/js/
-[webpack-badge]: https://img.shields.io/badge/Webpack?style=flat&logo=webpack&logoColor=%238DD6F9
+[webpack-badge]: https://img.shields.io/badge/Webpack-grey?style=flat&logo=webpack&logoColor=%238DD6F9
 [webpack-url]: https://webpack.js.org
 [site-badge]: https://img.shields.io/badge/Website-grey?style=flat
 [site-url]: https://lonneww.github.io/portfolio/
