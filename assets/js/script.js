@@ -141,7 +141,7 @@ async function convalidNewsId(res){
  */
 async function convalidNewsInfo(data){
   if (!data || data.title === undefined || data.url === undefined) {
-    consoleNotification = (data != null && data.id) ? `Error: invalid object at id ${data.id}. News skipped` : `Error: id number ${data} invalid. News skipped`; // Create a notification for the console
+    let consoleNotification = (data != null && data.id) ? `Error: invalid object at id ${data.id}. News skipped` : `Error: id number ${data} invalid. News skipped`; // Create a notification for the console
     console.log(consoleNotification);
     let newID;
     do {
