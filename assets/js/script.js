@@ -24,7 +24,7 @@ goes right, then calls the "getNewsDetails" function. During the execution it ch
 css styles of the loading elements.*/
 window.onload = async function() {
   try{
-    let promise = await fetch("https://hacker-news.firebaseio.com/v0/newstories.json");
+    let promise = await fetch(process.env.API_URL);
     idsArray = await promise.json();
   }catch(err){
     errorPanel.style.display = "flex";
@@ -79,7 +79,7 @@ async function getNewsDetails(){
       throw new noNewsAvailableError(`There are no more news available to load, please refresh the page to see more recent ones`)
     }
     let ids = idsArray.splice(0, 10);
-    let request = ids.map(id=>fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`));
+    let request = ids.map(id=>fetch(`${process.env.API_ID_URL}${id}.json`));
     let responses = await Promise.all(request);  
     for(let res of responses) {
       let validRes = await convalidNewsId(res);
@@ -122,7 +122,7 @@ async function convalidNewsId(res){
     }
     let newID = idsArray.splice(0, 1)[0];
     try {
-      res = await fetch(`https://hacker-news.firebaseio.com/v0/item/${newID}.json`);
+      res = await fetch(`${process.env.API_ID_URL}${newID}.json`);
     } catch (error) {
       console.error('Errore di rete:', error);
     }
@@ -149,7 +149,7 @@ async function convalidNewsInfo(data){
       newID = idsArray.splice(0, 1)[0];
     } while (newID === null || newID === undefined)
     try{
-      let request = await fetch(`https://hacker-news.firebaseio.com/v0/item/${newID}.json`);
+      let request = await fetch(`${process.env.API_ID_URL}${newID}.json`);
       data = await request.json();
     } catch (err){
       console.log(`Error ${err.name}: id number ${newID} invalid. News skipped`) //Recall itself if title or url are invalid
