@@ -4,7 +4,7 @@
   "description": "<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->",
   "main": "script.js",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack && cp _redirects webpack/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
