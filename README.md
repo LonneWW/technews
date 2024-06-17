@@ -28,7 +28,7 @@
 
 <h3 align="center">Tech News</h3>
 
-[For the site, click here!](https://lonneww.github.io/technews/)
+[For the site, click here!](https://lonneww-technews.netlify.app/)
 
   <p align="center">
     This project is the pratical exam of the Javascript Advanced <a href="https://www.start2impact.it"> start2impact University's </a> course. </br>
