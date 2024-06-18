@@ -22,6 +22,6 @@ module.exports = {
     ]
   },
   plugins: [
-    new Dotenv()
-  ],
+      new webpack.DefinePlugin(envKeys),
+    ],
 };
