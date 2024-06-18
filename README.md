@@ -69,6 +69,7 @@
 - [![SASS][sass-badge]][sass-url]
 - [![JS][js-badge]][js-url]
 - [![WEBPACK][webpack-badge]][webpack-url]
+- [![DOTENV][dotenv-badge]][dotenv-url]
 
 </br>
 
@@ -140,6 +141,8 @@ If you'd like to spend some of your time to tell me what you think about it or m
 [js-url]: https://www.w3schools.com/js/
 [webpack-badge]: https://img.shields.io/badge/Webpack-grey?style=flat&logo=webpack&logoColor=%238DD6F9
 [webpack-url]: https://webpack.js.org
+[dotenv-badge]: https://img.shields.io/badge/Dotenv-grey?style=flat&logo=dotenv&logoColor=%23ECD53F
+[dotenv-url]: https://www.npmjs.com/package/dotenv
 [site-badge]: https://img.shields.io/badge/Website-grey?style=flat
 [site-url]: https://lonneww.github.io/portfolio/
 [instagram-shield]: https://img.shields.io/badge/Instagram-grey?style=flat&logo=instagram&logoColor=%23E4405F
