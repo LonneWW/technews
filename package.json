@@ -4,7 +4,7 @@
   "description": "<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->",
   "main": "script.js",
   "scripts": {
-    "build": "webpack && cp _redirects webpack/",
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,7 +12,6 @@
   "license": "ISC",
   "devDependencies": {
     "css-loader": "^7.1.2",
-    "dotenv-webpack": "^8.1.0",
     "sass": "^1.77.5",
     "sass-loader": "^14.2.1",
     "style-loader": "^4.0.0",
